@@ -1,0 +1,43 @@
+name: Temporary VA ABC archive transfer
+
+on:
+  push:
+    branches:
+      - agent/temporary-va-abc-archive-transfer
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download generated archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 5 --retry-delay 3 \
+            --output VA_ABC_Monthly_Discounts_Specials_Archive.zip \
+            'https://filebin.net/9z8sx2h6cgrdk1vd/VA_ABC_Monthly_Discounts_Specials_Archive.zip'
+          test -s VA_ABC_Monthly_Discounts_Specials_Archive.zip
+
+      - name: Validate ZIP and record checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          unzip -t VA_ABC_Monthly_Discounts_Specials_Archive.zip
+          sha256sum VA_ABC_Monthly_Discounts_Specials_Archive.zip | tee SHA256SUMS.txt
+          ls -lh VA_ABC_Monthly_Discounts_Specials_Archive.zip
+
+      - name: Upload transfer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: va-abc-monthly-discounts-specials-archive
+          path: |
+            VA_ABC_Monthly_Discounts_Specials_Archive.zip
+            SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
