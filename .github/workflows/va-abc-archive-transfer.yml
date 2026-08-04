@@ -1,6 +1,9 @@
 name: Temporary VA ABC archive transfer
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -20,7 +23,7 @@ jobs:
           set -euo pipefail
           curl --fail --location --retry 5 --retry-delay 3 \
             --output VA_ABC_Monthly_Discounts_Specials_Archive.zip \
-            'https://filebin.net/9z8sx2h6cgrdk1vd/VA_ABC_Monthly_Discounts_Specials_Archive.zip'
+            'https://filebin.net/u8iy1ou9b1ef62yl/VA_ABC_Monthly_Discounts_Specials_Archive.zip'
           test -s VA_ABC_Monthly_Discounts_Specials_Archive.zip
 
       - name: Validate ZIP and record checksum
@@ -29,6 +32,7 @@ jobs:
           set -euo pipefail
           unzip -t VA_ABC_Monthly_Discounts_Specials_Archive.zip
           sha256sum VA_ABC_Monthly_Discounts_Specials_Archive.zip | tee SHA256SUMS.txt
+          unzip -l VA_ABC_Monthly_Discounts_Specials_Archive.zip > ARCHIVE_CONTENTS.txt
           ls -lh VA_ABC_Monthly_Discounts_Specials_Archive.zip
 
       - name: Upload transfer artifact
@@ -38,6 +42,7 @@ jobs:
           path: |
             VA_ABC_Monthly_Discounts_Specials_Archive.zip
             SHA256SUMS.txt
+            ARCHIVE_CONTENTS.txt
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
