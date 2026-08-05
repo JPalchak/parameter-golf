@@ -17,30 +17,30 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Download complete rate-limited archive
+      - name: Download Wayback augmentation archive
         shell: bash
         run: |
           set -euo pipefail
           curl --fail --location --retry 8 --retry-all-errors --retry-delay 3 \
-            --output VA_ABC_Monthly_Discounts_Specials_Complete_Archive.zip \
-            'https://deploy-preview-76--va-abc-spirits-hunter.netlify.app/VA_ABC_Monthly_Discounts_Specials_Complete_Archive.zip'
-          test -s VA_ABC_Monthly_Discounts_Specials_Complete_Archive.zip
+            --output VA_ABC_Monthly_Sales_Wayback_Augmentation.zip \
+            'https://deploy-preview-77--va-abc-spirits-hunter.netlify.app/VA_ABC_Monthly_Sales_Wayback_Augmentation.zip'
+          test -s VA_ABC_Monthly_Sales_Wayback_Augmentation.zip
 
       - name: Validate ZIP and record checksum
         shell: bash
         run: |
           set -euo pipefail
-          unzip -t VA_ABC_Monthly_Discounts_Specials_Complete_Archive.zip
-          sha256sum VA_ABC_Monthly_Discounts_Specials_Complete_Archive.zip | tee SHA256SUMS.txt
-          unzip -l VA_ABC_Monthly_Discounts_Specials_Complete_Archive.zip > ARCHIVE_CONTENTS.txt
-          ls -lh VA_ABC_Monthly_Discounts_Specials_Complete_Archive.zip
+          unzip -t VA_ABC_Monthly_Sales_Wayback_Augmentation.zip
+          sha256sum VA_ABC_Monthly_Sales_Wayback_Augmentation.zip | tee SHA256SUMS.txt
+          unzip -l VA_ABC_Monthly_Sales_Wayback_Augmentation.zip > ARCHIVE_CONTENTS.txt
+          ls -lh VA_ABC_Monthly_Sales_Wayback_Augmentation.zip
 
       - name: Upload transfer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: va-abc-monthly-discounts-specials-complete-archive
+          name: va-abc-monthly-sales-wayback-augmentation
           path: |
-            VA_ABC_Monthly_Discounts_Specials_Complete_Archive.zip
+            VA_ABC_Monthly_Sales_Wayback_Augmentation.zip
             SHA256SUMS.txt
             ARCHIVE_CONTENTS.txt
           if-no-files-found: error
