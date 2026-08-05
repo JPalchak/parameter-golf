@@ -17,30 +17,30 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Download targeted gap recovery archive
+      - name: Download conservative origin recovery archive
         shell: bash
         run: |
           set -euo pipefail
           curl --fail --location --retry 8 --retry-all-errors --retry-delay 3 \
-            --output VA_ABC_Monthly_Sales_Targeted_Gap_Recovery.zip \
-            'https://deploy-preview-79--va-abc-spirits-hunter.netlify.app/VA_ABC_Monthly_Sales_Targeted_Gap_Recovery.zip'
-          test -s VA_ABC_Monthly_Sales_Targeted_Gap_Recovery.zip
+            --output VA_ABC_Monthly_Sales_Origin_Gap_Recovery.zip \
+            'https://deploy-preview-80--va-abc-spirits-hunter.netlify.app/VA_ABC_Monthly_Sales_Origin_Gap_Recovery.zip'
+          test -s VA_ABC_Monthly_Sales_Origin_Gap_Recovery.zip
 
       - name: Validate ZIP and record checksum
         shell: bash
         run: |
           set -euo pipefail
-          unzip -t VA_ABC_Monthly_Sales_Targeted_Gap_Recovery.zip
-          sha256sum VA_ABC_Monthly_Sales_Targeted_Gap_Recovery.zip | tee SHA256SUMS.txt
-          unzip -l VA_ABC_Monthly_Sales_Targeted_Gap_Recovery.zip > ARCHIVE_CONTENTS.txt
-          ls -lh VA_ABC_Monthly_Sales_Targeted_Gap_Recovery.zip
+          unzip -t VA_ABC_Monthly_Sales_Origin_Gap_Recovery.zip
+          sha256sum VA_ABC_Monthly_Sales_Origin_Gap_Recovery.zip | tee SHA256SUMS.txt
+          unzip -l VA_ABC_Monthly_Sales_Origin_Gap_Recovery.zip > ARCHIVE_CONTENTS.txt
+          ls -lh VA_ABC_Monthly_Sales_Origin_Gap_Recovery.zip
 
       - name: Upload transfer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: va-abc-monthly-sales-targeted-gap-recovery
+          name: va-abc-monthly-sales-origin-gap-recovery
           path: |
-            VA_ABC_Monthly_Sales_Targeted_Gap_Recovery.zip
+            VA_ABC_Monthly_Sales_Origin_Gap_Recovery.zip
             SHA256SUMS.txt
             ARCHIVE_CONTENTS.txt
           if-no-files-found: error
