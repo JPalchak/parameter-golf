@@ -17,57 +17,32 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Bootstrap Virginia ABC session
+      - name: Download exact Common Crawl gap-recovery archive
         shell: bash
         run: |
           set -euo pipefail
-          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
-          curl --fail --location --retry 6 --retry-all-errors --retry-delay 5 \
-            --user-agent "$UA" \
-            --cookie-jar cookies.txt \
-            --output product-downloads.html \
-            'https://www.abc.virginia.gov/products/products-faqs/product-downloads'
-          test -s product-downloads.html
+          curl --fail --location --retry 8 --retry-all-errors --retry-delay 3 \
+            --output VA_ABC_Monthly_Sales_CommonCrawl_Exact_Gap_Recovery.zip \
+            'https://deploy-preview-81--va-abc-spirits-hunter.netlify.app/VA_ABC_Monthly_Sales_CommonCrawl_Exact_Gap_Recovery.zip'
+          test -s VA_ABC_Monthly_Sales_CommonCrawl_Exact_Gap_Recovery.zip
 
-      - name: Download current August 2026 PDF and Excel
+      - name: Validate ZIP and record checksum
         shell: bash
         run: |
           set -euo pipefail
-          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
-          REFERER='https://www.abc.virginia.gov/products/products-faqs/product-downloads'
-          curl --fail --location --retry 8 --retry-all-errors --retry-delay 8 \
-            --user-agent "$UA" --referer "$REFERER" --cookie cookies.txt \
-            --output monthly-specials-august-2026.pdf \
-            'https://www.abc.virginia.gov/library/products/pdfs/monthly-specials-august-2026.pdf'
-          sleep 8
-          curl --fail --location --retry 8 --retry-all-errors --retry-delay 8 \
-            --user-agent "$UA" --referer "$REFERER" --cookie cookies.txt \
-            --output monthly-specials-august-2026.xlsx \
-            'https://www.abc.virginia.gov/library/products/other-documents/monthly-specials-august-2026.xlsx'
-
-      - name: Validate signatures and checksums
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(head -c 5 monthly-specials-august-2026.pdf)" = '%PDF-'
-          python - <<'PY'
-          from pathlib import Path
-          p = Path('monthly-specials-august-2026.xlsx')
-          b = p.read_bytes()
-          assert b[:4] == b'PK\x03\x04', b[:20]
-          assert b'[Content_Types].xml' in b
-          PY
-          sha256sum monthly-specials-august-2026.pdf monthly-specials-august-2026.xlsx | tee SHA256SUMS.txt
-          ls -lh monthly-specials-august-2026.pdf monthly-specials-august-2026.xlsx
+          unzip -t VA_ABC_Monthly_Sales_CommonCrawl_Exact_Gap_Recovery.zip
+          sha256sum VA_ABC_Monthly_Sales_CommonCrawl_Exact_Gap_Recovery.zip | tee SHA256SUMS.txt
+          unzip -l VA_ABC_Monthly_Sales_CommonCrawl_Exact_Gap_Recovery.zip > ARCHIVE_CONTENTS.txt
+          ls -lh VA_ABC_Monthly_Sales_CommonCrawl_Exact_Gap_Recovery.zip
 
       - name: Upload transfer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: va-abc-current-august-2026-monthly-specials
+          name: va-abc-monthly-sales-commoncrawl-exact-gap-recovery
           path: |
-            monthly-specials-august-2026.pdf
-            monthly-specials-august-2026.xlsx
+            VA_ABC_Monthly_Sales_CommonCrawl_Exact_Gap_Recovery.zip
             SHA256SUMS.txt
+            ARCHIVE_CONTENTS.txt
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
