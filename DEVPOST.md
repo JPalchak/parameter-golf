@@ -10,11 +10,11 @@ The human supplies physical-world evidence; the agent turns it into a safer, com
 
 ## Live URL
 
-https://raw.githack.com/JPalchak/parameter-golf/repair-relay-webmcp/repair-relay-webmcp-app/index.html
+https://repair-relay-webmcp.ottermode.chatgpt.site
 
 ## Public code repository
 
-https://github.com/JPalchak/parameter-golf/tree/repair-relay-webmcp/repair-relay-webmcp-app
+https://github.com/JPalchak/parameter-golf/tree/repair-relay-webmcp
 
 ## Demo video
 
@@ -66,7 +66,12 @@ The same division of labor continues through execution: the agent assembles a bo
 Repair Relay is a static JavaScript application that uses the imperative WebMCP API. `src/tool-definitions.js` defines eight tools with closed JSON Schemas, bounded inputs and outputs, descriptions, and annotations. `src/webmcp.js` registers them with:
 
 ```js
-await document.modelContext.registerTool(tool);
+await document.modelContext.registerTool({
+  name: "search_products",
+  description: "Search the product catalog",
+  inputSchema: searchProductsTool.inputSchema,
+  execute: async (input, options) => searchProductsTool.execute(input, options)
+}, { signal: controller.signal });
 ```
 
 The required catalog tool is present with the exact contract:
@@ -110,7 +115,7 @@ Luna is the project’s deterministic adversarial reviewer. It evaluates six dim
 - human-agent experience
 - safety and trust
 
-Luna reruns after meaningful state changes and every 60 seconds in the app. The repository also includes a command-line gate and a scheduled GitHub Actions workflow for recurring code review once the workflow is on the default branch. It specifically checks for the required registration call, exact catalog tool, closed schemas, and accidental agent approval authority.
+Luna reruns after meaningful state changes and every 60 seconds in the app. The repository also includes a command-line gate and a scheduled GitHub Actions workflow for recurring review from the default branch. The workflow writes recommendations to its run summary and stores machine-readable and Markdown reports as artifacts. It specifically checks for the required registration call, exact catalog tool, closed schemas, and accidental agent approval authority.
 
 ### Testing and execution quality
 
@@ -166,9 +171,9 @@ The demo uses a deterministic local catalog so judges can reproduce every result
 - **Organization (28251):** Not applicable
 - **App Status (28252):** New
 - **Existing project updates (28253):** Not applicable; Repair Relay was created for this challenge.
-- **Live URL (28254):** https://raw.githack.com/JPalchak/parameter-golf/repair-relay-webmcp/repair-relay-webmcp-app/index.html
+- **Live URL (28254):** https://repair-relay-webmcp.ottermode.chatgpt.site
 - **Testing instructions (28255):** Use the nine-step judge path above. No credentials are required.
-- **Public code repo (28256):** https://github.com/JPalchak/parameter-golf/tree/repair-relay-webmcp/repair-relay-webmcp-app
+- **Public code repo (28256):** https://github.com/JPalchak/parameter-golf/tree/repair-relay-webmcp
 - **Agent/client testing (28257):** Automated Chromium real-DOM WebMCP registration harness with WebMCP feature flags; manual Chrome/ChatGPT test procedure included for judges.
 - **AI tools used (28258):** OpenAI ChatGPT GPT-5.6 Pro, GitHub connector, Devpost Hackathons connector, and Playwright-based browser evaluation.
 - **Learning level (28259):** Significant

@@ -52,6 +52,26 @@ export function parseSearchInput(input = {}) {
     "includeDiagnosticTools"
   ]);
 
+  for (const key of ["query", "category", "model"]) {
+    if (input[key] != null && typeof input[key] !== "string") {
+      throw new TypeError(`${key} must be a string.`);
+    }
+  }
+  if (input.budget != null && typeof input.budget !== "number") {
+    throw new TypeError("budget must be a number.");
+  }
+  if (input.evidenceTags != null) {
+    if (!Array.isArray(input.evidenceTags)) {
+      throw new TypeError("evidenceTags must be an array.");
+    }
+    if (input.evidenceTags.length > 7 || input.evidenceTags.some((tag) => typeof tag !== "string")) {
+      throw new TypeError("evidenceTags must contain at most seven strings.");
+    }
+  }
+  if (input.includeDiagnosticTools != null && typeof input.includeDiagnosticTools !== "boolean") {
+    throw new TypeError("includeDiagnosticTools must be a boolean.");
+  }
+
   const query = sanitizeText(input.query ?? "", MAX_QUERY_LENGTH);
   const category = input.category ? sanitizeText(input.category, 60) : null;
   const model = input.model ? sanitizeText(input.model, 40).toUpperCase() : null;
@@ -267,8 +287,16 @@ export function buildRepairPlan(caseState, candidate, rawInput = {}) {
   if (!candidate) throw new RangeError("A valid candidate is required.");
   assertPlainObject(rawInput);
   assertNoExtraKeys(rawInput, ["objective", "maxSteps", "notes"]);
+  for (const key of ["objective", "notes"]) {
+    if (rawInput[key] != null && typeof rawInput[key] !== "string") {
+      throw new TypeError(`${key} must be a string.`);
+    }
+  }
+  if (rawInput.maxSteps != null && !Number.isInteger(rawInput.maxSteps)) {
+    throw new TypeError("maxSteps must be an integer.");
+  }
   const objective = sanitizeText(rawInput.objective || `Restore safe airflow using ${candidate.name}.`, 180);
-  const maxSteps = clamp(Number(rawInput.maxSteps ?? 5), 3, 7);
+  const maxSteps = clamp(rawInput.maxSteps ?? 5, 3, 7);
   const notes = sanitizeText(rawInput.notes ?? "", 240);
   const hasBlockedFilter = caseState.evidence.some((item) => item.tag === "blocked_filter" && item.confidence >= 0.7);
   const hasFanRunning = caseState.evidence.some((item) => item.tag === "fan_running" && item.confidence >= 0.7);

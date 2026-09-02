@@ -15,7 +15,10 @@ const hasRequiredLiteral =
   source.includes('name: "search_products"') &&
   source.includes('description: "Search the product catalog"');
 const webmcpSource = await readFile(resolve(root, "src/webmcp.js"), "utf8");
-const registrationPresent = webmcpSource.includes("document.modelContext.registerTool(tool)");
+const registrationPresent =
+  webmcpSource.includes("document.modelContext.registerTool({") &&
+  webmcpSource.includes('name: "search_products"') &&
+  webmcpSource.includes('{ signal: controller.signal }');
 const approvalTool = tools.find((tool) => /^(approve|authorize)(_|$)/i.test(tool.name));
 
 const findings = [

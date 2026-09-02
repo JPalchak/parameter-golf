@@ -8,6 +8,7 @@ import {
   compareCandidates,
   createObservation,
   normalizeText,
+  parseSearchInput,
   rankProducts,
   throwIfAborted
 } from "../src/engine.js";
@@ -46,6 +47,13 @@ test("ranked catalog responses are bounded", () => {
   const search = rankProducts(PRODUCT_CATALOG, { query: "", model: "AP-200", budget: 1000 }, createInitialState());
   assert.ok(search.results.length <= 5);
   assert.ok(search.results.length > 0);
+});
+
+test("search input rejects schema-invalid runtime types", () => {
+  assert.throws(() => parseSearchInput({ query: 42 }), /query must be a string/i);
+  assert.throws(() => parseSearchInput({ budget: "65" }), /budget must be a number/i);
+  assert.throws(() => parseSearchInput({ evidenceTags: "blocked_filter" }), /evidenceTags must be an array/i);
+  assert.throws(() => parseSearchInput({ includeDiagnosticTools: "true" }), /must be a boolean/i);
 });
 
 test("known model incompatibility cannot rank first", () => {
@@ -101,6 +109,13 @@ test("repair plans are staged, reversible, and include stop conditions", () => {
   assert.ok(plan.steps.length >= 3 && plan.steps.length <= 5);
   assert.ok(plan.steps.every((step) => step.stopCondition.length > 10));
   assert.ok(plan.assumptions.length > 0);
+});
+
+test("repair plans reject malformed maxSteps instead of creating empty plans", () => {
+  const state = createInitialState();
+  const candidate = rankProducts(PRODUCT_CATALOG, { model: "AP-200" }, state).results[0];
+  assert.throws(() => buildRepairPlan(state, candidate, { maxSteps: "not-an-integer" }), /must be an integer/i);
+  assert.throws(() => buildRepairPlan(state, candidate, { maxSteps: 4.5 }), /must be an integer/i);
 });
 
 test("agent authorization cannot approve a staged plan", () => {

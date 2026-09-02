@@ -2,23 +2,17 @@ name: Repair Relay CI
 
 on:
   push:
-    branches:
-      - repair-relay-webmcp
     paths:
-      - "repair-relay-webmcp-app/**"
+      - "**"
       - ".github/workflows/repair-relay-ci.yml"
   pull_request:
     paths:
-      - "repair-relay-webmcp-app/**"
+      - "**"
       - ".github/workflows/repair-relay-ci.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
-
-defaults:
-  run:
-    working-directory: repair-relay-webmcp-app
 
 jobs:
   contracts:
@@ -49,5 +43,5 @@ jobs:
         if: always()
         with:
           name: repair-relay-browser-smoke
-          path: repair-relay-webmcp-app/reports/browser-smoke.png
+          path: reports/browser-smoke.png
           if-no-files-found: ignore

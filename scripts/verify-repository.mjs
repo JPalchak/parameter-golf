@@ -46,7 +46,9 @@ const readme = await readFile(resolve(root, "README.md"), "utf8");
 const assertions = [
   [source.includes('name: "search_products"'), "search_products tool name is absent"],
   [source.includes('description: "Search the product catalog"'), "required catalog description is absent"],
-  [registration.includes("document.modelContext.registerTool(tool)"), "registerTool call is absent"],
+  [registration.includes("document.modelContext.registerTool({"), "registerTool call is absent"],
+  [registration.includes('name: "search_products"'), "search_products is not registered explicitly"],
+  [registration.includes('{ signal: controller.signal }'), "tool registration lacks lifecycle cancellation"],
   [!source.match(/name:\s*["']approve(?:_|-)/i), "an agent approval tool is present"],
   [source.match(/additionalProperties:\s*false/g)?.length >= 8, "not every input schema is closed"],
   [license.startsWith("MIT License"), "MIT license is malformed or missing"],

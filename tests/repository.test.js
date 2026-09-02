@@ -8,7 +8,10 @@ const read = (path) => readFile(new URL(path, new URL("../", import.meta.url)), 
 
 test("imperative WebMCP registration is present", async () => {
   const source = await read("src/webmcp.js");
-  assert.match(source, /document\.modelContext\.registerTool\(tool\)/);
+  assert.match(source, /document\.modelContext\.registerTool\(\{/);
+  assert.match(source, /name:\s*["']search_products["']/);
+  assert.match(source, /description:\s*["']Search the product catalog["']/);
+  assert.match(source, /\{ signal: controller\.signal \}/);
 });
 
 test("required catalog tool literals are present in source", async () => {

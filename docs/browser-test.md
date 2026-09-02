@@ -3,7 +3,7 @@
 ## Judge path: ChatGPT in-app browser
 
 1. Open the live URL:
-   `https://raw.githack.com/JPalchak/parameter-golf/repair-relay-webmcp/repair-relay-webmcp-app/index.html`
+   `https://repair-relay-webmcp.ottermode.chatgpt.site`
 2. Ask the browser agent:
 
    > Inspect this repair case, search for the best compatible fix under the budget, and explain which physical observation would most change your recommendation.
@@ -93,7 +93,7 @@ npm run test:browser
 To test the deployed build instead of the local server:
 
 ```bash
-LIVE_URL="https://raw.githack.com/JPalchak/parameter-golf/repair-relay-webmcp/repair-relay-webmcp-app/index.html" npm run test:browser
+LIVE_URL="https://repair-relay-webmcp.ottermode.chatgpt.site" npm run test:browser
 ```
 
 The smoke test injects a deterministic `document.modelContext` registration harness before page load, while also launching Chromium with WebMCP feature flags. It then uses the actual page DOM and actual tool callbacks to validate the complete collaboration loop.
